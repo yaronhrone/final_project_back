@@ -35,7 +35,7 @@ CREATE TABLE items (
     username VARCHAR(50) NOT NULL,
     date_order DATE NOT NULL DEFAULT CURRENT_DATE,
     shipping_address VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'TEMP',
     FOREIGN KEY (username) REFERENCES users(username),
     PRIMARY KEY(id)
     );
@@ -51,7 +51,8 @@ CREATE TABLE items (
     );
 
     INSERT INTO users (username, password, first_name, last_name, email, phone, address, role) VALUES
-    ('admin', '$2a$10$nb/SCAWFXf7y/Tk45EOs7umtkF2K69jjl2uuH4ghB41P6/h.m4zW2', 'admin', 'admin', '5Zm4Z@example.com', '1234567890', '123 Main St','USER');
+    ('admin', '$2a$10$nb/SCAWFXf7y/Tk45EOs7umtkF2K69jjl2uuH4ghB41P6/h.m4zW2', 'admin', 'admin', '5Zm4Z@example.com', '1234567890', '123 Main St','USER'),
+    ('yar','$2a$10$58rp5kaUmrqr6SJQo1X3Semte6mAxMcktNNeOekY0S/xS1MpdeRTq', 'yar', 'yar', 'yar@yar', '1234567890', '123 Main St' ,'USER');
 
     INSERT INTO items (title, photo, price, stock) VALUES
     ('Item 1', 'https://example.com/item1.jpg', 9.99, 10),

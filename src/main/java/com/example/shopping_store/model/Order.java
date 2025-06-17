@@ -1,9 +1,9 @@
 package com.example.shopping_store.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jdk.jshell.Snippet;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Order {
     private int id;
@@ -12,14 +12,20 @@ public class Order {
     private LocalDate dateOrder;
     @JsonProperty("shipping_address")
     private String shippingAddress;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Status status;
+    private List<Item> items;
 
-    public Order(int id, String username, LocalDate dateOrder, String shippingAddress, Status status) {
+    public Order() {
+    }
+
+    public Order(int id, String username, LocalDate dateOrder, String shippingAddress, Status status, List<Item> items) {
         this.id = id;
         this.username = username;
         this.dateOrder = dateOrder;
         this.shippingAddress = shippingAddress;
         this.status = status;
+         this.items = items;
     }
 
     @Override
@@ -28,8 +34,16 @@ public class Order {
                 "userId='" + username + '\'' +
                 ", dateOrder=" + dateOrder +
                 ", shippingAddress='" + shippingAddress + '\'' +
-                ", status=" + status +
+                ", status=" + status + "orderItems=" + items +
                 '}';
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
     public int getId() {
@@ -40,7 +54,7 @@ public class Order {
         this.id = id;
     }
 
-    public Order() {
+    public Order(String username, String addressHelper, LocalDate now, Status temp) {
     }
 
     public String getUsername() {

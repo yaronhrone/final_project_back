@@ -54,5 +54,7 @@ public class UserService {
     public CustomUser getUserByEmail(String email) {
         return userRepository.getUserByEmail(email);
     }
-
+public String getAddressHelper(String username) {
+    return userRepository.getAddressHelper(username);
+}
 }

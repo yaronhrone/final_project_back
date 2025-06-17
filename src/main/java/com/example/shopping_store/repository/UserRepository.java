@@ -49,4 +49,8 @@ public class UserRepository {
         String sql = "SELECT * FROM " + USERS_TABLE + " WHERE email = ?";
         return jdbcTemplate.queryForObject(sql, new UserMapper(), email);
     }
+    public String getAddressHelper(String username) {
+        String sql = "SELECT address FROM " + USERS_TABLE + " WHERE username = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, username);
+    }
 }

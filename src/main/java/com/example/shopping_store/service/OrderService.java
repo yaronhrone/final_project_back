@@ -2,10 +2,12 @@ package com.example.shopping_store.service;
 
 
 import com.example.shopping_store.model.Order;
+import com.example.shopping_store.model.Status;
 import com.example.shopping_store.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,19 +19,18 @@ public class OrderService {
     @Autowired
     private UserService userService;
 
-    public String saveOrder(Order order) {
-        if (userService.getUserByUsername(order.getUsername()) != null) {
 
-        return orderRepository.saveOrder(order);
+    public void addItemToOrder(String username, int itemId) {
+
+        Integer openOrderId = orderRepository.findOpenOrderIdByUsername(username);
+
+        if (openOrderId == null) {
+            openOrderId = orderRepository.saveOrder(username,userService.getAddressHelper(username));
         }
-        return "User does not exist";
+        orderRepository.addItemToOrder(openOrderId, itemId);
+
     }
-    public String updateOrder(Order order ) {
-        if (userService.getUserByUsername(order.getUsername()) != null) {
-            return orderRepository.updateOrder(order);
-        }
-        return "User does not exist";
-    }
+
     public String deleteOrder(String username) {
         if (userService.getUserByUsername(username) != null) {
             return orderRepository.deleteOrder(username);
@@ -41,5 +42,15 @@ public class OrderService {
     }
     public List<Order> getAllOrders() {
         return orderRepository.getAllOrders();
+    }
+    public Order getOrderById (String username){
+        return orderRepository.getOrderById(username);
+    }
+    public void addItemToOrder(int idOrder, int itemId){
+        Integer exist = orderRepository.getItemIdFromOrderItem(idOrder, itemId);
+        if(exist !=null && exist == itemId ){
+            orderRepository.addToQuantity(idOrder, itemId);
+        } else {
+        orderRepository.addItemToOrder(idOrder, itemId);}
     }
 }

@@ -22,23 +22,20 @@ public class OrderController {
 
     @PostMapping("/add_order")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> addOrder(@RequestBody Order order,@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<String> addOrder(@RequestHeader(value = "Authorization") String token,@RequestParam int idItem) {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            order.setUsername(username);
+            orderService.addItemToOrder(username,idItem);
 
-            String result = orderService.saveOrder(order);
-            if (result.contains("successfully")) {
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
+            return new ResponseEntity<>("Order saved", HttpStatus.CREATED);
 
-            }
-            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
+
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/get_orders")
     public ResponseEntity<List<Order>> getOrders() {
@@ -80,7 +77,7 @@ public class OrderController {
         }
     }
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/get_order/{id}")
+    @GetMapping("/get_order")
     public ResponseEntity<Order> getOrder(@RequestHeader(value = "Authorization") String token) {
 
         try {
@@ -89,6 +86,29 @@ public class OrderController {
             return new ResponseEntity<>(orderService.getOrderByUsername(username), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/get_order1")
+    public ResponseEntity<Order> getOrderById(@RequestHeader(value = "Authorization") String token){
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            return new ResponseEntity<>(orderService.getOrderById(username),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("add_item")
+    public ResponseEntity addItemToOrder(@RequestHeader(value = "Authorization") String token,@RequestParam int orderId,@RequestParam int idItem){
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            orderService.addItemToOrder(orderId,idItem);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
