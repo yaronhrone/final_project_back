@@ -40,5 +40,9 @@ public class ItemRepository {
         String sql = "SELECT * FROM " + ITEMS_TABLE;
         return jdbcTemplate.query(sql, new ItemMapper());
     }
+    public void  updateStock(int itemId,int stock){
+        String sql = "UPDATE " + ITEMS_TABLE + " SET stock = ? WHERE id = ?";
+        jdbcTemplate.update(sql,stock, itemId);
+    }
 
 }

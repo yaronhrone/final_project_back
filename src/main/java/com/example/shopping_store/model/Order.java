@@ -14,12 +14,12 @@ public class Order {
     private String shippingAddress;
 //    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Status status;
-    private List<Item> items;
+    private List<OrderItem> items;
 
     public Order() {
     }
 
-    public Order(int id, String username, LocalDate dateOrder, String shippingAddress, Status status, List<Item> items) {
+    public Order(int id, String username, LocalDate dateOrder, String shippingAddress, Status status, List<OrderItem> items) {
         this.id = id;
         this.username = username;
         this.dateOrder = dateOrder;
@@ -38,11 +38,11 @@ public class Order {
                 '}';
     }
 
-    public List<Item> getItems() {
+    public List<OrderItem> getItems() {
         return items;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(List<OrderItem> items) {
         this.items = items;
     }
 

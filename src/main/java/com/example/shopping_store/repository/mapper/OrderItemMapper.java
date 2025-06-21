@@ -11,8 +11,10 @@ public class OrderItemMapper implements RowMapper<OrderItem> {
     public OrderItem mapRow(ResultSet rs, int rowNum) throws SQLException {
         OrderItem order = new OrderItem();
         order.setId(rs.getInt("id"));
-        order.setOrderId(rs.getInt("order_id"));
-        order.setItemId(rs.getInt("item_id"));
+        order.setTitle(rs.getString("title"));
+        order.setPhoto(rs.getString("photo"));
+        order.setPrice(rs.getDouble("price"));
+        order.setStock(rs.getInt("stock"));
         order.setQuantity(rs.getInt("quantity"));
         return order;
     }

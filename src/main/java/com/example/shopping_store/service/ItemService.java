@@ -59,4 +59,7 @@ public class ItemService {
     public List<Item> getAllItems() {
         return itemRepository.getAllItems();
     }
+    public void  updateStock(int itemId,int stock){
+        itemRepository.updateStock(itemId,stock);
+    }
 }

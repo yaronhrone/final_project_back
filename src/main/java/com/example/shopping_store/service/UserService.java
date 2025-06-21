@@ -14,6 +14,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private OrderService orderService;
 
     public String saveUser(CustomUser user) {
         System.out.println(user);
@@ -42,6 +44,8 @@ public class UserService {
     }
     public String deleteUser(String username) {
         if (userRepository.getUserByUsername(username) == null) {
+            orderService.deleteOrderByUsername(username);
+
             return "User does not exist";
         }
         return userRepository.deleteUser(username);

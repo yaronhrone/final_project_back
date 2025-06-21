@@ -2,31 +2,24 @@ package com.example.shopping_store.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
 
 public class OrderItem {
     private int id;
-    @JsonProperty("item_id")
-    private int itemId;
-    @JsonProperty("order_id")
-    private int orderId;
+    private String title;
+    private String photo;
+    private double price;
+    private int stock;
     private int quantity;
 
-    public OrderItem(int id, int itemId, int orderId, int quantity) {
-        this.id = id;
-        this.itemId = itemId;
-        this.orderId = orderId;
-        this.quantity = quantity;
-    }
+    public OrderItem() {}
 
-    @Override
-    public String toString() {
-        return "OrderItem{" +
-                "id=" + id +
-                ", itemId=" + itemId +
-                ", userId=" + orderId +
-                ", quantity=" + quantity +
-                '}';
+    public OrderItem(int id, String title, String photo, double price, int stock, int quantity) {
+        this.id = id;
+        this.title = title;
+        this.photo = photo;
+        this.price = price;
+        this.stock = stock;
+        this.quantity = quantity;
     }
 
     public int getId() {
@@ -37,23 +30,36 @@ public class OrderItem {
         this.id = id;
     }
 
-    public OrderItem() {
+    public String getTitle() {
+        return title;
     }
 
-    public int getItemId() {
-        return itemId;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
+    public String getPhoto() {
+        return photo;
     }
 
-    public int getOrderId() {
-        return orderId;
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public int getQuantity() {
