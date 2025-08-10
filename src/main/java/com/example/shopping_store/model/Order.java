@@ -12,20 +12,31 @@ public class Order {
     private LocalDate dateOrder;
     @JsonProperty("shipping_address")
     private String shippingAddress;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Status status;
     private List<OrderItem> items;
+    @JsonProperty("total_price")
+    private double total;
 
     public Order() {
     }
 
-    public Order(int id, String username, LocalDate dateOrder, String shippingAddress, Status status, List<OrderItem> items) {
+    public Order(int id,double total, String username, LocalDate dateOrder, String shippingAddress, Status status, List<OrderItem> items) {
         this.id = id;
         this.username = username;
         this.dateOrder = dateOrder;
         this.shippingAddress = shippingAddress;
         this.status = status;
          this.items = items;
+        this.total = total;
+
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     @Override
@@ -34,7 +45,7 @@ public class Order {
                 "userId='" + username + '\'' +
                 ", dateOrder=" + dateOrder +
                 ", shippingAddress='" + shippingAddress + '\'' +
-                ", status=" + status + "orderItems=" + items +
+                ", status=" + status + "orderItems=" + items + " total=" + total +
                 '}';
     }
 

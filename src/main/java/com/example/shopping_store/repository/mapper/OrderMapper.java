@@ -17,6 +17,8 @@ public class OrderMapper implements RowMapper<Order> {
         order.setDateOrder(rs.getDate("date_order").toLocalDate());
         order.setShippingAddress(rs.getString("shipping_address"));
         order.setStatus(Status.valueOf(rs.getString("status")));
+        order.setTotal(rs.getDouble("total_price"));
+
         return order;
     }
 }

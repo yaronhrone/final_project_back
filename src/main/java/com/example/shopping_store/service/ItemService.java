@@ -30,7 +30,7 @@ public class ItemService {
         return "Item already exists";
     }
     public String updateItem(Item item) {
-        if (item.getPhoto().trim().isEmpty() || item.getTitle().trim().isEmpty() || item.getPrice() == 0 || item.getStock() == 0) {
+        if (item.getPhoto().trim().isEmpty() || item.getTitle().trim().isEmpty() || item.getPrice() == 0 ) {
             return "Fields cannot be empty";
         }
 
@@ -59,7 +59,9 @@ public class ItemService {
     public List<Item> getAllItems() {
         return itemRepository.getAllItems();
     }
-    public void  updateStock(int itemId,int stock){
-        itemRepository.updateStock(itemId,stock);
+    public List<Item> searchItems(String search) {
+
+        return itemRepository.searchItems(search.toLowerCase());
     }
+
 }

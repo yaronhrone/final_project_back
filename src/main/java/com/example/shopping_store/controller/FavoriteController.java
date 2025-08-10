@@ -27,8 +27,10 @@ public class FavoriteController {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            favoriteService.addFavoriteItemToUser(username, idItem);
-            return new ResponseEntity<>("Item added to favorites", HttpStatus.CREATED);
+            String message = favoriteService.addFavoriteItemToUser(username, idItem);
+            if (message.contains("added")) {
+                return new ResponseEntity<>(message, HttpStatus.CREATED);
+            } return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -39,8 +41,10 @@ public class FavoriteController {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            favoriteService.removeFavoriteItemFromUser(username, idItem);
-            return new ResponseEntity<>("Item deleted from favorites", HttpStatus.OK);
+            String result = favoriteService.removeFavoriteItemFromUser(username, idItem);
+            if (result.contains("removed")) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+            } return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -53,6 +57,17 @@ public class FavoriteController {
             String username = jwtUtil.extractUsername(jwtToken);
             System.out.println("username from jwt: " + username);
             return new ResponseEntity<>(favoriteService.getFavoriteItemsByUsername(username), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/search/{title}")
+    public ResponseEntity<List<Item>> searchFavoriteItems(@RequestHeader(value = "Authorization") String token,@PathVariable String title) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            return new ResponseEntity<>(favoriteService.getFavoritesItemsBySearch(username, title), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

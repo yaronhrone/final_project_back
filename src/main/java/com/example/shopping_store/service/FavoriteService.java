@@ -16,17 +16,21 @@ public class FavoriteService {
     private UserService userService;
     @Autowired
     private ItemService itemService;
-    public void addFavoriteItemToUser(String username, int itemId) {
+    public String  addFavoriteItemToUser(String username, int itemId) {
         if (userService.getUserByUsername(username) == null) {
-            throw new IllegalArgumentException("User not found");
+            return "User not found" ;
+        }if (favoriteRepository.getFavoriteItemsByUsername(username).stream().anyMatch(item -> item.getId() == itemId)) {
+
+            return  "Item already in favorites";
         }
 
         if (itemService.getItemById(itemId) == null) {
-            throw new IllegalArgumentException("Item not found");
+            return "Item not found";
         }
 
 
         favoriteRepository.addFavoriteItemToUser(username, itemId);
+        return "Item added to favorites";
     }
     public List<Item> getFavoriteItemsByUsername(String username) {
         if (userService.getUserByUsername(username) == null) {
@@ -34,13 +38,21 @@ public class FavoriteService {
         }
         return favoriteRepository.getFavoriteItemsByUsername(username);
     }
-    public void removeFavoriteItemFromUser(String username, int itemId) {
+    public String removeFavoriteItemFromUser(String username, int itemId) {
         if (userService.getUserByUsername(username) == null) {
-            throw new IllegalArgumentException("User not found");
+            return "User not found";
         }
-        if (itemService.getItemById(itemId) == null) {
-            throw new IllegalArgumentException("Item not found");
+        if (itemService.getItemById(itemId) == null || favoriteRepository.getFavoriteItemsByUsername(username).stream().noneMatch(item -> item.getId() == itemId)) {
+            System.out.println(favoriteRepository.getFavoriteItemsByUsername(username).stream().noneMatch(item -> item.getId() == itemId));
+            return "Item not found";
         }
         favoriteRepository.removeFavoriteItemFromUser(username, itemId);
+        return "Item removed from favorites";
+    }
+    public List<Item> getFavoritesItemsBySearch(String title, String username) {
+        return favoriteRepository.searchItemsFromFavorites(username,title);
+    }
+    public void deleteFavoriteItemFromUser(String username) {
+        favoriteRepository.deleteAllFavorites(username);
     }
 }

@@ -19,6 +19,7 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) {
+
         try {
             AuthenticationResponse authResponse = authenticationService.createAuthenticationToken(authenticationRequest);
             return ResponseEntity.ok()

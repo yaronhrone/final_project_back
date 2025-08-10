@@ -30,4 +30,13 @@ public class FavoriteRepository {
         jdbcTemplate.update(sql, username, itemId);
 
     }
+    public List<Item> searchItemsFromFavorites(String title, String username) {
+        String sql = "SELECT i.* FROM " + FAVORITE_ITEMS_TABLE + " f JOIN " + ITEMS_TABLE + " i ON f.item_id = i.id WHERE LOWER(title) LIKE LOWER(?) AND f.username = ?";
+
+        return jdbcTemplate.query(sql, new ItemMapper(), "%" + title + "%",username);
+    }
+    public void deleteAllFavorites(String username) {
+        String sql = "DELETE FROM " + FAVORITE_ITEMS_TABLE + " WHERE username = ?";
+        jdbcTemplate.update(sql, username);
+    }
 }

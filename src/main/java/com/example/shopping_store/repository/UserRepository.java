@@ -25,7 +25,7 @@ public class UserRepository {
 
     public CustomUser updateUser(CustomUser user) {
         String sql = "UPDATE " + USERS_TABLE + " SET first_name = ?, last_name = ?,  password = ?, address = ?, phone = ? WHERE username = ?";
-        jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getPassword(), user.getAddress(), user.getEmail(), user.getPhone(), user.getUsername());
+        jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getPassword(), user.getAddress(), user.getPhone(), user.getUsername());
         return getUserByUsername(user.getUsername());
     }
 
@@ -46,9 +46,14 @@ public class UserRepository {
 
 
     public CustomUser getUserByEmail(String email) {
-        String sql = "SELECT * FROM " + USERS_TABLE + " WHERE email = ?";
-        return jdbcTemplate.queryForObject(sql, new UserMapper(), email);
+        try {
+            String sql = "SELECT * FROM " + USERS_TABLE + " WHERE email = ?";
+            return jdbcTemplate.queryForObject(sql, new UserMapper(), email);
+        } catch (Exception e) {
+            return null;
+        }
     }
+
     public String getAddressHelper(String username) {
         String sql = "SELECT address FROM " + USERS_TABLE + " WHERE username = ?";
         return jdbcTemplate.queryForObject(sql, String.class, username);

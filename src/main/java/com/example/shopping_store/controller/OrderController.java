@@ -26,10 +26,16 @@ public class OrderController {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            System.out.println( "username order: "+ username );
-            orderService.addItemToOrderAndOrder(username,itemId);
+            System.out.println( "username order: "+ username +" item id: "+itemId);
+            String result =  orderService.addItemToOrderAndOrder(username,itemId);
+            if (result.contains("added")){
 
-            return new ResponseEntity<>("Order saved", HttpStatus.CREATED);
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+
+            }
+
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -85,7 +91,9 @@ public class OrderController {
             Order order = orderService.getOrderByUsernameByStatusTemp(username);
             if (order != null) {
                 return new ResponseEntity<>(order, HttpStatus.OK);
-            } return new ResponseEntity("No order open",HttpStatus.BAD_REQUEST);
+            }
+            System.out.println("order null");
+            return new ResponseEntity("No order open",HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -29,18 +29,24 @@ public class OrderRepository {
     private UserService userService;
 
     public Order saveOrder(String username,String shippingAddress) {
-        String sql = "INSERT INTO " + ORDERS_TABLE + " (username, shipping_address) VALUES (?, ?)";
+        String sql = "INSERT INTO " + ORDERS_TABLE + " (username, shipping_address, total_price) VALUES (?, ?, 0)";
         jdbcTemplate.update(sql, username, shippingAddress);
 
         return getOrderByUsernameByStatusTemp(username);
 
 
     }
+    public void updateOrder(Order order) {
 
-    public String updateOrderToClose(String username,int orderId) {
-        String sql = "UPDATE " + ORDERS_TABLE + " SET  status = 'CLOSE' WHERE  username = ? AND id = ?";
-        jdbcTemplate.update(sql, username,orderId);
-        return "Order updated successfully";
+        String sql = "UPDATE " + ORDERS_TABLE + " SET  status = ?, shipping_address = ?, date_order = ?, total_price = ? WHERE  id = ?";
+        jdbcTemplate.update(sql, order.getStatus().name(),order.getShippingAddress(),order.getDateOrder(),order.getTotal(),order.getId());
+
+    }
+
+    public void updateOrderToClose(String username,int orderId) {
+        String sql = "UPDATE " + ORDERS_TABLE + " SET  status = 'CLOSE' WHERE  id = ?";
+        jdbcTemplate.update(sql, orderId);
+
     }
     public Integer findOpenOrderIdByUsername(String username) {
         try {
@@ -51,23 +57,18 @@ public class OrderRepository {
             return null;
         }
     }
-    public String removeItemFromOrder(int orderId,int itemId) {
-        String sql = "DELETE FROM " + ORDER_ITEMS_TABLE + " WHERE order_id = ? AND item_id = ?";
-        jdbcTemplate.update(sql, orderId,itemId);
-        return "Item deleted successfully";
-    }
+
 
     public List<Order> getOrderByUsernameAndStatusClose(String username) {
-
         String sql = "SELECT * FROM " + ORDERS_TABLE + " WHERE username = ? AND status = 'CLOSE' ";
-        return jdbcTemplate.query(sql, new OrderMapper(), username);
+      List<Order> orders = jdbcTemplate.query(sql, new OrderMapper(), username);
+        for (Order order : orders) {
+            List<OrderItem> items = getItemsForOrderHelper(order.getId());
+            order.setItems(items);
+        }
+        return orders;
     }
 
-    public String deleteOrder(String username,int orderId) {
-        String sql = "DELETE FROM " + ORDERS_TABLE + " WHERE username = ? AND order_id = ?";
-            jdbcTemplate.update(sql, username, orderId);
-        return "Order deleted successfully";
-    }
     public void addItemToOrder(int orderId,int idItem) {
         String sql = "INSERT INTO " + ORDER_ITEMS_TABLE + " (order_id, item_id,quantity) VALUES (?, ?, 1)";
         jdbcTemplate.update(sql, orderId, idItem);
@@ -82,9 +83,7 @@ public class OrderRepository {
         }
         }
     public void addToQuantity(int itemId,int orderId){
-        System.out.println("orderId" + orderId);
         String sql = "UPDATE " + ORDER_ITEMS_TABLE + " SET quantity = quantity + 1 WHERE item_id = ? AND order_id = ?";
-        System.out.println( "add item");
         jdbcTemplate.update(sql, itemId,orderId);
     }
 
@@ -93,24 +92,18 @@ public class OrderRepository {
 
             String sqlOrder = "SELECT * FROM " + ORDERS_TABLE + " WHERE username = ? AND status = 'TEMP' LIMIT 1";
             List<Order> orders = jdbcTemplate.query(sqlOrder, new OrderMapper(), username);
-            System.out.println("order " + orders);
             if (orders.isEmpty()){
                 return null;
             }
             Order order = orders.getFirst();
             order.setItems(getItemsForOrderHelper(order.getId()));
-
+            System.out.println("order TEMP: " + order);
             return order;
         } catch (Exception e) {
             return null;
         }
     }
-    public OrderItem getOrderItemFromOrderHelper(int orderId,int itemId){
-        String sql = "SELECT i.* , oi.quantity FROM " + ITEMS_TABLE + " i " +
-                "JOIN " + ORDER_ITEMS_TABLE + " oi ON i.id = oi.item_id " +
-                "WHERE oi.order_id = ? AND oi.item_id = ?" ;
-        return jdbcTemplate.queryForObject(sql,new OrderItemMapper(),orderId,itemId);
-    }
+
     public List<OrderItem> getItemsForOrderHelper(int orderId) {
          String sqlItem = "SELECT i.* , oi.quantity FROM " + ITEMS_TABLE + " i " +
                  "JOIN " + ORDER_ITEMS_TABLE + " oi ON i.id = oi.item_id " +
@@ -130,34 +123,45 @@ public class OrderRepository {
     }
 
     public void deleteAllOrderUser(String username){
-        String sql = "DELETE * FROM " + ORDERS_TABLE + " WHERE username = ?";
+        String sql = "DELETE  FROM " + ORDERS_TABLE + " WHERE username = ?";
         jdbcTemplate.update(sql,username);
+    }
+    public void deleteItemOrder(int orderId){
+        String sql = "DELETE FROM " + ORDER_ITEMS_TABLE + " WHERE order_id = ? ";
+        jdbcTemplate.update(sql,orderId);
     }
     public void updateQuantityItem(int orderId,int itemId){
         String sql = "UPDATE " + ORDER_ITEMS_TABLE + " SET quantity = quantity - 1 WHERE item_id = ? AND order_id = ?";
         jdbcTemplate.update(sql,itemId,orderId);
     }
-    public void removeItemFromOrderNew(int orderId, int itemId) {
-        // קודם בודקים את הכמות
-        String getQuantitySql = "SELECT quantity FROM order_items WHERE order_id = ? AND item_id = ?";
-        Integer quantity = jdbcTemplate.queryForObject(getQuantitySql, Integer.class, orderId, itemId);
-
-        if (quantity == null) {
-            System.out.println("❌ המוצר לא נמצא בהזמנה");
-            return;
+    public double getTotalPriceForOrder(int orderId) {
+        String sql = "SELECT SUM(i.price * io.quantity) FROM " + ORDER_ITEMS_TABLE + " io JOIN " + ITEMS_TABLE + " i ON io.item_id = i.id WHERE order_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Double.class, orderId);
+        } catch (DataAccessException e) {
+            return 0.0;
         }
-
-        if (quantity > 1) {
-            // עדכון הכמות
-            String updateSql = "UPDATE order_items SET quantity = quantity - 1 WHERE order_id = ? AND item_id = ?";
-            jdbcTemplate.update(updateSql, orderId, itemId);
-            System.out.println("🔻 ירידה בכמות של המוצר בהזמנה");
-        } else {
-            // כמות היא 1 – מוחקים לגמרי את המוצר מההזמנה
-            String deleteSql = "DELETE FROM order_items WHERE order_id = ? AND item_id = ?";
-            jdbcTemplate.update(deleteSql, orderId, itemId);
-            System.out.println("🗑️ המוצר נמחק מההזמנה");
+    }
+    public Integer getQuantityFromOrderItem(int orderId, int itemId) {
+        String sql = "SELECT quantity FROM " + ORDER_ITEMS_TABLE + " WHERE order_id = ? AND item_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class, orderId, itemId);
+        } catch (DataAccessException e) {
+            return null;
         }
+    }
+    public void deleteOrderItem(int orderId,int itemId){
+        String sql = "DELETE FROM " + ORDER_ITEMS_TABLE + " WHERE order_id = ? AND item_id = ?";
+        jdbcTemplate.update(sql,orderId,itemId);
+    }
+    public List<Order> getOrderByUsername(String username) {
+        String sql = "SELECT * FROM " + ORDERS_TABLE + " WHERE username = ?";
+        List<Order> orders = jdbcTemplate.query(sql, new OrderMapper(), username);
+        for (Order order : orders) {
+            List<OrderItem> items = getItemsForOrderHelper(order.getId());
+            order.setItems(items);
+        }
+        return orders;
     }
 
 

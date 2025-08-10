@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/items")
 public class ItemController {
@@ -60,11 +62,21 @@ public class ItemController {
     }
 
     @GetMapping("/get_all_items")
-    public ResponseEntity<Iterable<Item>> getAllItems() {
+    public ResponseEntity<List<Item>> getAllItems() {
         try {
         return new ResponseEntity<>(itemService.getAllItems(),HttpStatus.OK);
 
         } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/search/{name}")
+    public ResponseEntity<List<Item>> getItemByName(@PathVariable String name) {
+            System.out.println("get item by name");
+        try {
+            return new ResponseEntity<>(itemService.searchItems(name),HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("error");
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

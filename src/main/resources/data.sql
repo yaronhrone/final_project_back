@@ -36,6 +36,7 @@ CREATE TABLE items (
     date_order DATE NOT NULL DEFAULT CURRENT_DATE,
     shipping_address VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'TEMP',
+    total_price DOUBLE ,
     FOREIGN KEY (username) REFERENCES users(username),
     PRIMARY KEY(id)
     );
@@ -54,7 +55,16 @@ CREATE TABLE items (
     ('admin', '$2a$10$nb/SCAWFXf7y/Tk45EOs7umtkF2K69jjl2uuH4ghB41P6/h.m4zW2', 'admin', 'admin', '5Zm4Z@example.com', '1234567890', '123 Main St','USER'),
     ('yar','$2a$10$58rp5kaUmrqr6SJQo1X3Semte6mAxMcktNNeOekY0S/xS1MpdeRTq', 'yar', 'yar', 'yar@yar', '1234567890', '123 Main St' ,'USER');
 
-    INSERT INTO items (title, photo, price, stock) VALUES
-    ('Item 1', 'https://example.com/item1.jpg', 9.99, 10),
-    ('Item 2', 'https://example.com/item2.jpg', 19.99, 5),
-    ('Item 3', 'https://example.com/item3.jpg', 29.99, 3);
+INSERT INTO items (title, photo, price, stock) VALUES
+('Dior Sauvage', 'https://www.sephora.com/productimages/sku/s2038123-main-zoom.jpg?imwidth=460', 399.90, 15),
+('Bleu de Chanel', 'https://www.sephora.com/productimages/sku/s1695972-main-zoom.jpg?imwidth=460', 429.00, 10),
+('Armani Acqua di Gio', 'https://www.sephora.com/productimages/sku/s2848695-main-zoom.jpg?imwidth=460', 349.90, 20),
+('Versace Eros', 'https://www.sephora.com/productimages/sku/s2371581-main-zoom.jpg?imwidth=1224', 319.00, 18),
+('Paco Rabanne 1 Million', 'https://www.sephora.com/productimages/sku/s2786531-main-zoom.jpg?imwidth=460', 299.90, 25),
+('Tom Ford Noir', 'https://www.sephora.com/productimages/sku/s1706423-main-zoom.jpg?imwidth=460', 549.00, 5),
+('YSL La Nuit de l’Homme', 'https://www.sephora.com/productimages/sku/s1200716-main-zoom.jpg?imwidth=460', 389.00, 12),
+('Burberry Hero', 'https://www.sephora.com/productimages/sku/s2841062-main-zoom.jpg?imwidth=460', 279.00, 20),
+('Calvin Klein Euphoria', 'https://www.sephora.com/productimages/sku/s2704062-main-zoom.jpg?imwidth=460', 199.90, 30),
+('Tom Ford ', 'https://www.sephora.com/productimages/sku/s1449289-main-zoom.jpg?imwidth=460', 259.00, 16),
+('Jean Paul Gaultier ', 'https://www.sephora.com/productimages/sku/s2822476-main-zoom.jpg?imwidth=460', 329.90, 9),
+('Dolce & Gabbana Light Blue', 'https://www.sephora.com/productimages/sku/s2863314-main-zoom.jpg?imwidth=460', 289.00, 14);

@@ -25,7 +25,9 @@ public class UserController {
     public ResponseEntity<String> saveUser(@RequestBody CustomUser user) {
         System.out.println("user controller " + user);
         try {
+
             String result = userService.saveUser(user);
+            System.out.println(result + "result");
             if (result.contains("successfully")){
                 return new ResponseEntity<>(result, HttpStatus.CREATED);
             }
