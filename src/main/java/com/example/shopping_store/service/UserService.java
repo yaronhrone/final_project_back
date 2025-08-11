@@ -60,7 +60,6 @@ public class UserService {
         }
             orderService.deleteOrderByUsername(username);
             favoriteService.deleteFavoriteItemFromUser(username);
-
         return userRepository.deleteUser(username);
     }
     public CustomUser getUserByUsername(String username) {

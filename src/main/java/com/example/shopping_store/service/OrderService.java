@@ -33,12 +33,15 @@ public class OrderService {
             order =  orderRepository.saveOrder(username,userService.getAddressHelper(username));
         }
         String result = addItemToOrder(order.getId(), itemId);
+        order.setItems(orderRepository.getItemsForOrderHelper(order.getId()));
+
 
 
         return result;
     }
     public String updateOrderToClose(String username) {
         Order order = orderRepository.getOrderByUsernameByStatusTemp(username);
+        order.setItems(orderRepository.getItemsForOrderHelper(order.getId()));
         if (order != null ) {
              orderRepository.updateOrderToClose(username, orderRepository.findOpenOrderIdByUsername(username));
             List<OrderItem> items = order.getItems();
@@ -62,8 +65,10 @@ public class OrderService {
     public Order getOrderByUsernameByStatusTemp(String username ) {
         Order order = orderRepository.getOrderByUsernameByStatusTemp(username);
 
-        if (order != null) {
-
+            if (order == null) {
+             return null;
+            }
+            order.setItems(orderRepository.getItemsForOrderHelper(order.getId()));
             if (order.getItems().isEmpty()) {
                 return null;
             }
@@ -72,11 +77,16 @@ public class OrderService {
 
             orderRepository.updateOrder(order);
             return order;
-        }
-        return null;
+
     }
     public List<Order> getAllOrdersByStatusCloseByUsername(String username) {
-        return orderRepository.getOrderByUsernameAndStatusClose(username);
+        List<Order> orders = orderRepository.getOrderByUsernameAndStatusClose(username);
+                for (Order order : orders) {
+            List<OrderItem> items = orderRepository.getItemsForOrderHelper(order.getId());
+            order.setItems(items);
+        }
+                return orders;
+
     }
     public String addItemToOrder(int idOrder, int itemId){
         Integer exist = orderRepository.getItemIdFromOrderItemHelper(idOrder, itemId);
@@ -101,6 +111,7 @@ public class OrderService {
         if (order == null) {
             return "user name don't have an open order";
         }
+        order.setItems(orderRepository.getItemsForOrderHelper(order.getId()));
         Integer quantity = orderRepository.getQuantityFromOrderItem(order.getId(), idItem);
         if (quantity == null) {
             return "not item in order exist";
@@ -115,10 +126,13 @@ return  "delete item from order";
     public void deleteOrderByUsername(String username){
         List<Order> orders = orderRepository.getOrderByUsername(username);
         for (Order order : orders) {
+            List<OrderItem> items = orderRepository.getItemsForOrderHelper(order.getId());
+            order.setItems(items);
             orderRepository.deleteItemOrder(order.getId());
 
         }
         orderRepository.deleteAllOrderUser(username);
+
     }
 
 }

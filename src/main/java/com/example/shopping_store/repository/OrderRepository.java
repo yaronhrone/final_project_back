@@ -62,10 +62,7 @@ public class OrderRepository {
     public List<Order> getOrderByUsernameAndStatusClose(String username) {
         String sql = "SELECT * FROM " + ORDERS_TABLE + " WHERE username = ? AND status = 'CLOSE' ";
       List<Order> orders = jdbcTemplate.query(sql, new OrderMapper(), username);
-        for (Order order : orders) {
-            List<OrderItem> items = getItemsForOrderHelper(order.getId());
-            order.setItems(items);
-        }
+
         return orders;
     }
 
@@ -78,7 +75,7 @@ public class OrderRepository {
         String sql = "SELECT item_id FROM " + ORDER_ITEMS_TABLE + " WHERE order_id = ? AND item_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, Integer.class, orderId, idItem);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             return null;
         }
         }
@@ -96,8 +93,6 @@ public class OrderRepository {
                 return null;
             }
             Order order = orders.getFirst();
-            order.setItems(getItemsForOrderHelper(order.getId()));
-            System.out.println("order TEMP: " + order);
             return order;
         } catch (Exception e) {
             return null;
@@ -105,22 +100,19 @@ public class OrderRepository {
     }
 
     public List<OrderItem> getItemsForOrderHelper(int orderId) {
-         String sqlItem = "SELECT i.* , oi.quantity FROM " + ITEMS_TABLE + " i " +
-                 "JOIN " + ORDER_ITEMS_TABLE + " oi ON i.id = oi.item_id " +
-                 "WHERE oi.order_id = ?";
-         List<OrderItem> items = jdbcTemplate.query(sqlItem, new OrderItemMapper(),orderId);
+        try {
+            String sqlItem = "SELECT i.* , oi.quantity FROM " + ITEMS_TABLE + " i " +
+                    "JOIN " + ORDER_ITEMS_TABLE + " oi ON i.id = oi.item_id " +
+                    "WHERE oi.order_id = ?";
+            List<OrderItem> items = jdbcTemplate.query(sqlItem, new OrderItemMapper(), orderId);
 
-         return items;
-    }
-
-    public List<Order> getCloseOrdersWithItems(String username) {
-        List<Order> orders = getOrderByUsernameAndStatusClose(username);
-        for (Order order : orders) {
-            List<OrderItem> items = getItemsForOrderHelper(order.getId());
-            order.setItems(items);
+            return items;
+        } catch (Exception e) {
+            return null;
         }
-        return orders;
     }
+
+
 
     public void deleteAllOrderUser(String username){
         String sql = "DELETE  FROM " + ORDERS_TABLE + " WHERE username = ?";
@@ -138,7 +130,7 @@ public class OrderRepository {
         String sql = "SELECT SUM(i.price * io.quantity) FROM " + ORDER_ITEMS_TABLE + " io JOIN " + ITEMS_TABLE + " i ON io.item_id = i.id WHERE order_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, Double.class, orderId);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             return 0.0;
         }
     }
@@ -157,10 +149,7 @@ public class OrderRepository {
     public List<Order> getOrderByUsername(String username) {
         String sql = "SELECT * FROM " + ORDERS_TABLE + " WHERE username = ?";
         List<Order> orders = jdbcTemplate.query(sql, new OrderMapper(), username);
-        for (Order order : orders) {
-            List<OrderItem> items = getItemsForOrderHelper(order.getId());
-            order.setItems(items);
-        }
+
         return orders;
     }
 
